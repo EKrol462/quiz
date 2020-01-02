@@ -39,12 +39,16 @@ public class ServerClient implements Runnable {
 	private static int 				port;
 	private static String           ip;
 	
-	// Store Client Name
-	public static String playerName = "Client";
+
+
 	//String pName = playerName;
 	
 	//Store Client Age
 	public static int 						playerAge;
+	
+	public String playerName2 = "Client";
+	
+	public String playerAnswer; // player answer to question
 	
 	
 	
@@ -82,7 +86,7 @@ public class ServerClient implements Runnable {
 			try {
 				closeAll();
 			} catch (Exception exc) {
-				System.err.println(playerName + ":" + "error in opening a connection to: " + this.host + " on port: " + this.port);
+				System.err.println(playerName2 + ":" + "error in opening a connection to: " + this.host + " on port: " + this.port);
 			}
 
 			throw ex; // Rethrow the exception.
@@ -95,7 +99,7 @@ public class ServerClient implements Runnable {
 
 	}
 	//gathers player details
-	public static void playerDetails() {
+	/*public static void playerDetails() {
 		Scanner playerInfo = new Scanner(System.in);
 		
 		System.out.println("Welcome! Please Enter Your Player Name:");
@@ -103,9 +107,9 @@ public class ServerClient implements Runnable {
 		System.out.println("What is your age?");
 		playerAge = playerInfo.nextInt();
 		System.out.println("Welcome " + playerName + " " + playerAge);
-		playerDetailsReceived = true;
+		playerDetailsReceived = true; 
 		
-	} 
+	} */
 	
 	
 	
@@ -115,12 +119,6 @@ public class ServerClient implements Runnable {
 	 * @throws IOException
 	 */
 
-	public void sendNameToServer(String pName) throws IOException {
-		if (this.clientSocket == null || this.output == null)
-			throw new SocketException("Socket does not exist");
-		this.output.writeObject(playerName);
-	}
-	
 	public void sendMessageToServer(String msg) throws IOException {
 		if (this.clientSocket == null || this.output == null)
 			throw new SocketException("socket does not exist");
@@ -178,9 +176,33 @@ public class ServerClient implements Runnable {
 	 * 
 	 */
 	public void runClient() {
-		/*
-		System.out.println("Enter your name:");
+	
+		//Writes player Name as an object to the output Stream
+		System.out.println("Welcome, Enter your name :");
+		try {
+			Scanner playerInfo = new Scanner(System.in);
+			playerName2 = playerInfo.nextLine();
+			this.output.writeObject(playerName2);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} System.out.println("Welcome to The Game! " + playerName2);
 		
+		//Writes Player Answer as an object
+		System.out.println("What is your answer?");
+		try {
+			Scanner playerAns = new Scanner(System.in);
+			playerAnswer = playerAns.nextLine();
+			this.output.writeObject(playerAnswer);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} System.out.println("Your answer is: " + playerAnswer);
+		
+		
+		
+	
+		/*
 		try {
 			BufferedReader fromConsole = new BufferedReader(new InputStreamReader(System.in));
 			String playerName = null;
@@ -208,12 +230,12 @@ public class ServerClient implements Runnable {
 					break;
 			}
 			
-			System.out.println(playerName + ":" + "stopping client...");
+			System.out.println(playerName2 + ":" + "stopping client...");
 			this.stopClient = true;
 			fromConsole.close();
 			//closeAll();
 		} catch (Exception ex) {
-			System.out.println(playerName + ":" + "unexpected error while reading from console!");
+			System.out.println(playerName2 + ":" + "unexpected error while reading from console!");
 		}
 
 	}
@@ -229,12 +251,12 @@ public class ServerClient implements Runnable {
 			try {
 				sendMessageToServer(userResponse);
 			} catch (IOException e) {
-				System.err.println(playerName + ":" + "error when sending message to server: " + e.toString());
+				System.err.println(playerName2 + ":" + "error when sending message to server: " + e.toString());
 
 				try {
 					closeAll();
 				} catch (IOException ex) {
-					System.err.println(playerName + ":" + "error closing the client connections: " + ex.toString());
+					System.err.println(playerName2 + ":" + "error closing the client connections: " + ex.toString());
 				}
 			}
 		}
@@ -289,7 +311,7 @@ public class ServerClient implements Runnable {
 				handleMessageFromServer(msg);
 			}
 			
-			System.out.println(playerName + ":" + "client stopped..");
+			System.out.println(playerName2 + ":" + "client stopped..");
 		} catch (Exception exception) {
 			if (!this.stopClient) {
 				try {
@@ -302,7 +324,7 @@ public class ServerClient implements Runnable {
 			clientReader = null;
 		}
 		
-		System.out.println(playerName + ":" +  "exiting thread...");
+		System.out.println(playerName2 + ":" +  "exiting thread...");
 	}
 	
 	/**
@@ -311,11 +333,11 @@ public class ServerClient implements Runnable {
 	 */
 	public static void main(String[] args) {
 	
-		playerDetails();
-		if (playerDetailsReceived = true)
-		{
+		//playerDetails();
+		//if (playerDetailsReceived = true)
+	//	{
 			serverConnectDetails ();
-			if (serverDetailsReceived = true) {
+			if (serverDetailsReceived = true) {							
 	
 
 		ServerClient chatclient = null;
@@ -324,7 +346,7 @@ public class ServerClient implements Runnable {
 		try {
 			chatclient = new ServerClient(ip, port);
 		} catch (IOException e) {
-			System.err.println(playerName + ":" + "Error in openning the client connection to " + ip + " on port: " + port);
+			System.err.println(":" + "Error in openning the client connection to " + ip + " on port: " + port);
 		}
 		
 		System.out.println("Connected Succesfully, Welcome to The Game!");
@@ -336,4 +358,4 @@ public class ServerClient implements Runnable {
 	}
 
 }
-}
+//}

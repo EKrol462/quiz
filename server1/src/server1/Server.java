@@ -72,10 +72,17 @@ public class Server extends ServerAbstractComponents implements Runnable {
 	/*	public synchronized void handleNameFromClient(String pName, ServerClientManager client) {
 			String clientName = pName; 
 		} */
-		public  String playerName;
-		public synchronized void sendNameToServer(String pName, ServerClientManager client) {
-			playerName = pName;
-			}
+		public String playerName2;
+		public synchronized void sendNameToServer2(String pName2, ServerClientManager client) {
+			client.playerName2 = pName2;
+		}
+		
+		public String playerAnswer;
+		public synchronized void sendAnswerToServer(String ans, ServerClientManager client) {
+			client.playerAnswer = ans;
+		}
+		
+		
 			
 		
 		public synchronized void handleMessagesFromClient(String msg, ServerClientManager client) {
@@ -84,7 +91,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			 String formattedMessage = String.format("[client %d] : %s", client.getClientID(), msg); 
 
 				if(msg.equals(new String("test"))) {
-					System.out.println("your name is:" + playerName);
+					System.out.println("Your name is:" + client.playerName2 + client.playerAnswer); //Tests user Name
 				} else 
 				
 	        display(formattedMessage);

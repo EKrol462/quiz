@@ -31,8 +31,10 @@ public class ServerClientManager extends Thread {
 		private int 					clientID;
 		
 		
-		//Store Declared Player Name from ServerClient Class
+		//Store Declared Player Information from ServerClient Class
 		public String playerName;
+		public String playerName2;
+		public String playerAnswer;
 		//public String pName = playerName;
 				
 
@@ -130,18 +132,34 @@ public class ServerClientManager extends Thread {
 			// The message from the client
 			String pName = null;
 			String msg = "";
+			String pName2 = null;
+			String ans = null;
 			
-			//Name
+			//Name2
 			try {
-				pName = (String)this.in.readObject();
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			this.server.sendNameToServer(pName, this);
+			pName2 = (String)this.in.readObject();
+		} catch (ClassNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		this.server.sendNameToServer2(pName2, this);
+		
+		//Answer to question 
+		try {
+			ans = (String)this.in.readObject();
+		} catch (ClassNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		this.server.sendAnswerToServer(ans, this);
+			
+		
 			
 			//String pName = "QQQ";
 			try {
