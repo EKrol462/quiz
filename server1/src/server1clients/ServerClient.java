@@ -311,7 +311,7 @@ public class ServerClient implements Runnable {
 	 */
 	public static void main(String[] args) {
 	
-		//playerDetails();
+		playerDetails();
 		if (playerDetailsReceived = true)
 		{
 			serverConnectDetails ();
