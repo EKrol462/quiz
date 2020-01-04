@@ -50,6 +50,7 @@ public class ServerClient implements Runnable {
 	
 	public String playerAnswer; // player answer to question
 	
+	public String playerPoints;
 	
 	
 	static boolean playerDetailsReceived = false;
@@ -177,6 +178,15 @@ public class ServerClient implements Runnable {
 	 */
 	public void runClient() {
 	
+		//Writes Player points as an object
+		try {
+			playerPoints = "60";
+			this.output.writeObject(playerPoints);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
 		//Writes player Name as an object to the output Stream
 		System.out.println("Welcome, Enter your name :");
 		try {
@@ -198,8 +208,6 @@ public class ServerClient implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} System.out.println("Your answer is: " + playerAnswer);
-		
-		
 		
 	
 		/*

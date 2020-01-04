@@ -77,10 +77,31 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			client.playerName2 = pName2;
 		}
 		
+		public String playerPoints;
+		public synchronized void sendPointsToServer(String pPoints, ServerClientManager client) {
+			client.playerPoints = pPoints;
+		}
+		
+		
 		public String playerAnswer;
 		public synchronized void sendAnswerToServer(String ans, ServerClientManager client) {
 			client.playerAnswer = ans;
+			
+			String response;
+			if(client.playerAnswer.equals("A"))
+			{
+	        //prepare a response for the client. 
+			response = "[server says]: That's correct!";				
+			} else {
+				response = "[server says]: That's incorrect!";
+				
+			} sendMessageToClient(response, client);
+			
+			
 		}
+		
+
+		
 		
 		
 			
@@ -91,15 +112,19 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			 String formattedMessage = String.format("[client %d] : %s", client.getClientID(), msg); 
 
 				if(msg.equals(new String("test"))) {
-					System.out.println("Your name is:" + client.playerName2 + client.playerAnswer); //Tests user Name
+					System.out.println("Your name is:" + client.playerName2 + " Your Answer is: " + client.playerAnswer + " You Have: " + client.playerPoints); //Tests user Name
 				} else 
 				
 	        display(formattedMessage);
 	      
-	   
+		/*	if(client.playerAnswer == "A")
+			{
 	        //prepare a response for the client. 
-			//String response = "[server says]: " + msg.toUpperCase();					
-			//sendMessageToClient(response, client);
+			String response = "[server says]: That's correct!";				
+			sendMessageToClient(response, client);
+			} else {
+				String response = "[server says]: That's incorrect!";
+			}  */
 			
 		}
 		

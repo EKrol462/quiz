@@ -35,7 +35,10 @@ public class ServerClientManager extends Thread {
 		public String playerName;
 		public String playerName2;
 		public String playerAnswer;
+		public String playerPoints;
 		//public String pName = playerName;
+
+		public String message;
 				
 
 		
@@ -92,8 +95,18 @@ public class ServerClientManager extends Thread {
 			if (this.clientSocket == null || this.out == null)
 				throw new SocketException("socket does not exist");
 			
+			
 			this.out.writeObject(msg);
 		}
+		
+		/*Custom message from server
+		public void sendMessageToClient2(String msg2)  throws IOException {
+			if (this.clientSocket == null || this.out == null)
+				throw new SocketException("socket does not exist");
+			
+			
+			this.out.writeObject(msg2);
+		} */
 		
 		/**
 		 * Closes all connections for the client. 
@@ -130,10 +143,24 @@ public class ServerClientManager extends Thread {
 		public void run() {
 			
 			// The message from the client
-			String pName = null;
 			String msg = "";
 			String pName2 = null;
 			String ans = null;
+			String msg2 = "";
+			String pPoints = "0";
+		
+			//Points
+			try {
+			pPoints = (String)this.in.readObject();
+		} catch (ClassNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		this.server.sendPointsToServer(pPoints, this);
+			
 			
 			//Name2
 			try {
@@ -147,6 +174,8 @@ public class ServerClientManager extends Thread {
 		}
 		this.server.sendNameToServer2(pName2, this);
 		
+		
+		
 		//Answer to question 
 		try {
 			ans = (String)this.in.readObject();
@@ -158,7 +187,12 @@ public class ServerClientManager extends Thread {
 			e2.printStackTrace();
 		}
 		this.server.sendAnswerToServer(ans, this);
+		
+		
 			
+		
+		
+		
 		
 			
 			//String pName = "QQQ";
@@ -166,7 +200,6 @@ public class ServerClientManager extends Thread {
 				while (!this.stopConnection) {
 					// This block waits until it reads a message from the client
 					// and then sends it for handling by the server,
-					// thread indefinitely waits at the following
 					// statement until something is received from the server
 					 
 					
