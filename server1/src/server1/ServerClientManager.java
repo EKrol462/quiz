@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
+
 //import server1clients.ServerClient;
 
 
@@ -37,8 +38,12 @@ public class ServerClientManager extends Thread {
 		public String playerAnswer;
 		public String playerPoints;
 		//public String pName = playerName;
+		public String gameQuestion;
 
 		public String message;
+
+		public String gameStarted;
+		
 				
 
 		
@@ -91,13 +96,23 @@ public class ServerClientManager extends Thread {
 		 * @throws IOException
 		 */
 		     
-		public void sendMessageToClient(String msg) throws IOException {
-			if (this.clientSocket == null || this.out == null)
+		
+		 	public void sendQuestionToClient(String gQuestion) throws IOException {
+				if (this.clientSocket == null || this.out == null)
+					throw new SocketException("socket does not exist");
+				
+				this.out.writeObject(gQuestion);
+			} 
+		     
+		  public void sendMessageToClient(String msg) throws IOException {
+			  if (this.clientSocket == null || this.out == null)
 				throw new SocketException("socket does not exist");
 			
 			
 			this.out.writeObject(msg);
 		}
+		
+	
 		
 		/*Custom message from server
 		public void sendMessageToClient2(String msg2)  throws IOException {
@@ -144,10 +159,12 @@ public class ServerClientManager extends Thread {
 			
 			// The message from the client
 			String msg = "";
+			String gQuestion = "";
 			String pName2 = null;
 			String ans = null;
 			String msg2 = "";
 			String pPoints = "0";
+			String gStarted = "false";
 		
 			//Points
 			try {
@@ -162,7 +179,7 @@ public class ServerClientManager extends Thread {
 		this.server.sendPointsToServer(pPoints, this);
 			
 			
-			//Name2
+			//Name
 			try {
 			pName2 = (String)this.in.readObject();
 		} catch (ClassNotFoundException e2) {
@@ -174,9 +191,23 @@ public class ServerClientManager extends Thread {
 		}
 		this.server.sendNameToServer2(pName2, this);
 		
+		/*
+		//Game Started boolean
+		try {
+			gStarted = (String)this.in.readObject();
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		this.server.sendPlayerReady(gStarted,this);
+		*/
 		
-		
+	//	if(gStarted.equals("true")) {
 		//Answer to question 
+	
 		try {
 			ans = (String)this.in.readObject();
 		} catch (ClassNotFoundException e2) {
@@ -188,6 +219,23 @@ public class ServerClientManager extends Thread {
 		}
 		this.server.sendAnswerToServer(ans, this);
 		
+		/*
+		//Second Answer
+		try {
+			ans = (String)this.in.readObject();
+		} catch (ClassNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		this.server.sendAnswerToServer(ans, this); */
+		
+		
+		
+		
+		//}
 		
 			
 		

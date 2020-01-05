@@ -48,9 +48,17 @@ public class ServerClient implements Runnable {
 	
 	public String playerName2 = "Client";
 	
+	public String playerInput;
+	
 	public String playerAnswer; // player answer to question
 	
 	public String playerPoints;
+	
+	String gameQuestion;
+
+	public String gameStarted = "false";
+	
+	public boolean playerReady = false;
 	
 	
 	static boolean playerDetailsReceived = false;
@@ -99,19 +107,6 @@ public class ServerClient implements Runnable {
 		this.clientReader.start();
 
 	}
-	//gathers player details
-	/*public static void playerDetails() {
-		Scanner playerInfo = new Scanner(System.in);
-		
-		System.out.println("Welcome! Please Enter Your Player Name:");
-		playerName = playerInfo.nextLine();
-		System.out.println("What is your age?");
-		playerAge = playerInfo.nextInt();
-		System.out.println("Welcome " + playerName + " " + playerAge);
-		playerDetailsReceived = true; 
-		
-	} */
-	
 	
 	
 	/**
@@ -131,6 +126,14 @@ public class ServerClient implements Runnable {
 	 * Handle message from the server. In this case, simply display them. 
 	 * @param msg
 	 */
+	
+
+	public void sendQuestionToServer(String gQuestion) {
+		//gameQuestion = gQuestion;
+		display(gQuestion);
+	} 
+	
+	
 	public void handleMessageFromServer(String msg) {
 		display(msg);
 
@@ -197,46 +200,65 @@ public class ServerClient implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} System.out.println("Welcome to The Game! " + playerName2);
+		//System.out.println(gameQuestion);
 		
+		/*
+		if(playerReady == true) {
+			try {
+				gameStarted = "true";
+				this.output.writeObject(gameStarted);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		
+		while(gameStarted == "true") { */
+			
 		//Writes Player Answer as an object
-		System.out.println("What is your answer?");
+		Scanner playerAns = new Scanner(System.in);
+		playerInput = playerAns.nextLine();
+		
 		try {
-			Scanner playerAns = new Scanner(System.in);
-			playerAnswer = playerAns.nextLine();
+			playerAnswer = playerInput;
 			this.output.writeObject(playerAnswer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} System.out.println("Your answer is: " + playerAnswer);
-		
-	
+		//} 
+		//}
 		/*
-		try {
-			BufferedReader fromConsole = new BufferedReader(new InputStreamReader(System.in));
-			String playerName = null;
-			
-		while (true) { 
-			playerName = fromConsole.readLine();
-			handleUserInput(playerName);
-			
-				break; } 
-		} catch (Exception ex) {
-			System.out.println(playerName + ":" + "unexpected error while reading from console!");
-		}
-		*/
+			//Answer 2
+			try {
+				Scanner playerAns = new Scanner(System.in);
+				playerAnswer = playerAns.nextLine();
+				this.output.writeObject(playerAnswer);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} System.out.println("Your answer is: " + playerAnswer);
+			//} 
+			//} */
 		
 		
-		try {
-			BufferedReader fromConsole = new BufferedReader(new InputStreamReader(System.in));
-			String message = null;
+			try {
+				BufferedReader fromConsole = new BufferedReader(new InputStreamReader(System.in));
+				String message = null;
+	
+			
 
+				
 			while (true) {
 				message = fromConsole.readLine();
 				handleUserInput(message);
-				if(message.equals("over"))
+			/*	if(message.equals("ready")) {
+					System.out.println("You are ready!");
+					playerReady = true;
+				} */
+				if(message.equals("over")) {
 						
-					break;
-			}
+					break; }
+				} 
 			
 			System.out.println(playerName2 + ":" + "stopping client...");
 			this.stopClient = true;
@@ -304,6 +326,7 @@ public class ServerClient implements Runnable {
 
 		String msg;
 		String pName;
+		String gQuestion;
 		
 		// Loop waiting for data
 
@@ -312,10 +335,12 @@ public class ServerClient implements Runnable {
 				// Get data from Server and send it to the handler
 				// The thread waits indefinitely at the following
 				// statement until something is received from the server
+				//gQuestion = (String) input.readObject();
 				msg = (String) input.readObject();
 
 				// Concrete subclasses do what they want with the
 				// msg by implementing the following method
+				//handleQuestionFromServer(gQuestion);
 				handleMessageFromServer(msg);
 			}
 			
@@ -341,9 +366,6 @@ public class ServerClient implements Runnable {
 	 */
 	public static void main(String[] args) {
 	
-		//playerDetails();
-		//if (playerDetailsReceived = true)
-	//	{
 			serverConnectDetails ();
 			if (serverDetailsReceived = true) {							
 	

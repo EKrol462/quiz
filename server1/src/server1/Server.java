@@ -3,6 +3,7 @@ package server1;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -17,6 +18,9 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		// reference variable for ClientHandler for the server. 
 		private ServerClientManager 			clientHandler;
 
+		// reference variable to store object IO streams, should be used when working with serialized objects.
+		private ObjectOutputStream 		output;
+		
 		// boolean flag to indicate the server stop. 
 		private boolean 				stopServer;
 
@@ -32,13 +36,13 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		
 		public Server() {
 			
-			this.stopServer = false;
 			
 			/**
 			 * Initializes the ThreadGroup. 
 			 * Use of a ThreadGroup is easier when handling multiple clients, although it is not a must. 
 			 */
 			this.clientThreadGroup = new ThreadGroup("ClientManager threads");
+			
 		}
 		
 		/**
@@ -58,6 +62,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			serverListenerThread = new Thread(this);
 			serverListenerThread.start();
 
+
 		}
   
 		/**
@@ -69,13 +74,23 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		 * @param msg
 		 * @param client
 		 */
-	/*	public synchronized void handleNameFromClient(String pName, ServerClientManager client) {
-			String clientName = pName; 
-		} */
+
+		
+		public synchronized void runGame(ServerClientManager client) {
+
+		}
+		
+		public String gameQuestion;
 		public String playerName2;
 		public synchronized void sendNameToServer2(String pName2, ServerClientManager client) {
 			client.playerName2 = pName2;
-		}
+			
+			gameQuestion = "A czy B?";
+			sendMessageToClient(gameQuestion, client);
+			
+			
+		
+		  	}
 		
 		public String playerPoints;
 		public synchronized void sendPointsToServer(String pPoints, ServerClientManager client) {
@@ -83,22 +98,34 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		}
 		
 		
-		public String playerAnswer;
-		public synchronized void sendAnswerToServer(String ans, ServerClientManager client) {
-			client.playerAnswer = ans;
-			
-			String response;
-			if(client.playerAnswer.equals("A"))
-			{
-	        //prepare a response for the client. 
-			response = "[server says]: That's correct!";				
-			} else {
-				response = "[server says]: That's incorrect!";
-				
-			} sendMessageToClient(response, client);
-			
+		
+		
+	/*	public synchronized void sendQuestionToClient (String gQuestion, ServerClientManager client) {
+		gQuestion = gameQuestion;
+		try {
+			client.sendQuestionToClient(gQuestion);
+			this.output.writeObject(gQuestion);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		} */
+		public String gameStarted;
+		public synchronized void sendPlayerReady(String gStarted, ServerClientManager client) {
+			client.gameStarted = gStarted;
 			
 		}
+		
+		public String playerAnswer;
+		public synchronized void sendAnswerToServer(String ans, ServerClientManager client) {
+
+			//if(client.gameStarted.equals("true")) {
+			
+			client.playerAnswer = ans;
+			
+						
+			//}
+			}	
+		
 		
 
 		
@@ -113,7 +140,9 @@ public class Server extends ServerAbstractComponents implements Runnable {
 
 				if(msg.equals(new String("test"))) {
 					System.out.println("Your name is:" + client.playerName2 + " Your Answer is: " + client.playerAnswer + " You Have: " + client.playerPoints); //Tests user Name
-				} else 
+				} else if (msg.equals(new String("ready"))) {
+					sendMessageToClient("Player " + client.playerName2 + " is Ready", client); 
+				} else
 				
 	        display(formattedMessage);
 	      
@@ -150,12 +179,11 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		public void handleUserInput(String msg) {
 			
 
-			if(msg.equals(new String("over"))) {
+			if(msg.equals(new String("Oover"))) {
 				this.stopServer = true;
 				close();
 				return;
-			}
-			
+			}			
 			Thread[] clientThreadList = getClientConnections();
 			for (int i = 0; i < clientThreadList.length; i++) {
 				try {
@@ -176,6 +204,16 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		 * @param msg		Message
 		 * @param client	Client to be sent
 		 */
+		
+		public synchronized void sendQuestionToClient(String gQuestion, ServerClientManager client) {
+			try {
+				gameQuestion = "SIema eniu";
+				gQuestion = gameQuestion;
+				client.sendMessageToClient(gQuestion);
+			} catch (IOException e) {
+				System.err.println("[server: ] Server-to-client Question sending failed...");
+			}
+		}
 		public synchronized void sendMessageToClient(String msg, ServerClientManager client) {
 			try {
 				client.sendMessageToClient(msg);
@@ -183,6 +221,8 @@ public class Server extends ServerAbstractComponents implements Runnable {
 				System.err.println("[server: ] Server-to-client message sending failed...");
 			}
 		}
+		
+		
 		
 		
 		
