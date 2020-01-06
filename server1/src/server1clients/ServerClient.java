@@ -48,9 +48,9 @@ public class ServerClient implements Runnable {
 	
 	public String playerName2 = "Client";
 	
-	public String playerInput;
+	public String[] playerInput = new String[4];
 	
-	public String playerAnswer; // player answer to question
+	public String playerAnswer [] = new String[4]; // player answer to question
 	
 	public String playerPoints;
 	
@@ -186,46 +186,57 @@ public class ServerClient implements Runnable {
 			playerPoints = "60";
 			this.output.writeObject(playerPoints);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Error sending player points");
 			e.printStackTrace();
 		} 
 		
 		//Writes player Name as an object to the output Stream
+
 		System.out.println("Welcome, Enter your name :");
 		try {
 			Scanner playerInfo = new Scanner(System.in);
 			playerName2 = playerInfo.nextLine();
 			this.output.writeObject(playerName2);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Error sending player name");
 			e.printStackTrace();
 		} System.out.println("Welcome to The Game! " + playerName2);
 		//System.out.println(gameQuestion);
 		
-		/*
-		if(playerReady == true) {
-			try {
+		String readycheck = "";
+		String ready = "ready";
+		if (!readycheck.equals(ready) ); {
+		Scanner playerRdy = new Scanner(System.in);
+		System.out.println("Enter ready to start the game.");
+		readycheck = playerRdy.nextLine();
+		}
+		
+		if(readycheck.equals("ready")) {
+		try {
 				gameStarted = "true";
 				this.output.writeObject(gameStarted);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
+				System.out.println("Error sending game ready");
 				e1.printStackTrace();
 			}
 		
-		while(gameStarted == "true") { */
-			
+		if(gameStarted.equals("true")) {
+	
+			for (int i = 0; i < 5; i++) {
 		//Writes Player Answer as an object
 		Scanner playerAns = new Scanner(System.in);
-		playerInput = playerAns.nextLine();
+		playerInput[i] = playerAns.nextLine();
 		
 		try {
-			playerAnswer = playerInput;
-			this.output.writeObject(playerAnswer);
+			playerAnswer[i] = playerInput[i];
+			this.output.writeObject(playerAnswer[i]);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Error sending player answer");
 			e.printStackTrace();
-		} System.out.println("Your answer is: " + playerAnswer);
-		//} 
+		} System.out.println("Your answer is: " + playerAnswer[i]);
+		//gameStarted = "false";
+		} 
+		}
 		//}
 		/*
 			//Answer 2
@@ -267,7 +278,7 @@ public class ServerClient implements Runnable {
 		} catch (Exception ex) {
 			System.out.println(playerName2 + ":" + "unexpected error while reading from console!");
 		}
-
+	 }// end ready check
 	}
 
 	/**

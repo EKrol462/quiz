@@ -35,7 +35,7 @@ public class ServerClientManager extends Thread {
 		//Store Declared Player Information from ServerClient Class
 		public String playerName;
 		public String playerName2;
-		public String playerAnswer;
+		public String playerAnswer [] = new String[4];
 		public String playerPoints;
 		//public String pName = playerName;
 		public String gameQuestion;
@@ -161,7 +161,7 @@ public class ServerClientManager extends Thread {
 			String msg = "";
 			String gQuestion = "";
 			String pName2 = null;
-			String ans = null;
+		    String ans [] = {"", "", "", "", ""};
 			String msg2 = "";
 			String pPoints = "0";
 			String gStarted = "false";
@@ -173,7 +173,7 @@ public class ServerClientManager extends Thread {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		} catch (IOException e2) {
-			// TODO Auto-generated catch block
+			System.out.println("Error sending player points to server");
 			e2.printStackTrace();
 		}
 		this.server.sendPointsToServer(pPoints, this);
@@ -186,12 +186,12 @@ public class ServerClientManager extends Thread {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		} catch (IOException e2) {
-			// TODO Auto-generated catch block
+			System.out.println("Error sending player name to server");
 			e2.printStackTrace();
 		}
 		this.server.sendNameToServer2(pName2, this);
 		
-		/*
+		
 		//Game Started boolean
 		try {
 			gStarted = (String)this.in.readObject();
@@ -199,26 +199,27 @@ public class ServerClientManager extends Thread {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+			System.out.println("Error sending player answer");
 			e1.printStackTrace();
 		}
 		this.server.sendPlayerReady(gStarted,this);
-		*/
 		
-	//	if(gStarted.equals("true")) {
+		
+		if(gStarted.equals("true")) {
 		//Answer to question 
 	
+			for (int i = 0; i < 5; i++) {
 		try {
-			ans = (String)this.in.readObject();
+			ans [i] = (String) this.in.readObject();
 		} catch (ClassNotFoundException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		} catch (IOException e2) {
-			// TODO Auto-generated catch block
+			System.out.println("Error sending player answer to server");
 			e2.printStackTrace();
 		}
 		this.server.sendAnswerToServer(ans, this);
-		
+			}
 		/*
 		//Second Answer
 		try {
@@ -285,7 +286,7 @@ public class ServerClientManager extends Thread {
 					}				
 				}
 			}
-			
+		}	
 
 						
 		}

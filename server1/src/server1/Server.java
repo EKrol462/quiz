@@ -76,19 +76,14 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		 */
 
 		
-		public synchronized void runGame(ServerClientManager client) {
 
-		}
+			
 		
-		public String gameQuestion;
+		
+		
 		public String playerName2;
 		public synchronized void sendNameToServer2(String pName2, ServerClientManager client) {
 			client.playerName2 = pName2;
-			
-			gameQuestion = "A czy B?";
-			sendMessageToClient(gameQuestion, client);
-			
-			
 		
 		  	}
 		
@@ -109,22 +104,98 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		} */
+		
+		public String [] gameQuestion = {"A czy B?", "C czy D?"};
+		
 		public String gameStarted;
+		int questionSent = 0 ;
 		public synchronized void sendPlayerReady(String gStarted, ServerClientManager client) {
 			client.gameStarted = gStarted;
-			
-		}
-		
-		public String playerAnswer;
-		public synchronized void sendAnswerToServer(String ans, ServerClientManager client) {
 
-			//if(client.gameStarted.equals("true")) {
+
+			if (client.gameStarted.equals("true") )
+			{
+			if(questionSent == 0) {
+			sendMessageToClient(gameQuestion[0], client);
+			}
 			
-			client.playerAnswer = ans;
+			if(questionSent == 1) {
+			sendMessageToClient(gameQuestion[1], client);
+			} 
+			} 
+				}
+		
+		public String playerAnswer[];
+		public String [] gameAnswer = {"A", "A"};
+		public synchronized void sendAnswerToServer(String ans[], ServerClientManager client) {
+		/*	if (client.gameStarted.equals("true") )
+			{
+			for (int i = 0; i < 5;) {
+				 client.playerAnswer[i] = ans[i];
+				 String response;
+				 sendMessageToClient(gameQuestion[0], client);
+				 System.out.println("Game Answer:"+ gameAnswer[i]);
+				 System.out.println("player Answer:" + client.playerAnswer[i]);
+			     
+			 if(client.playerAnswer[i].equals(gameAnswer[i])) {
+		        //prepare a response for the client. 
+				response = "[server says]: That's correct!";				
+				} else {
+					response = "[server says]: That's incorrect!";
+					 }
+				sendMessageToClient(response, client);
+				
+				client.playerAnswer[i] = "";
+		} 
+			}
+			client.gameStarted = "false"; */
+			//TODO Make a for loop
+			client.playerAnswer[0] = ans[0]; 
+			String response;
+			System.out.println("Game Answer:"+ gameAnswer[0]);
+			System.out.println("player Answer:" + client.playerAnswer[0]);
 			
-						
-			//}
-			}	
+			if(client.playerAnswer[0].equals(gameAnswer[0]))
+			{
+	        //prepare a response for the client. 
+			response = "[server says]: That's correct!";				
+			} else {
+				response = "[server says]: That's incorrect!";
+				 }
+			sendMessageToClient(response, client);
+			client.playerAnswer[0] = null;
+			response = null;
+			questionSent++;
+			
+			
+			
+			client.playerAnswer[1] = ans[1]; 
+			
+			if(questionSent == 1) {
+			System.out.println("Game Answer:"+ gameAnswer[1]);
+			System.out.println("player Answer:" + client.playerAnswer[1]);
+			
+			if(client.playerAnswer[1].equals(gameAnswer[1])) {
+	        //prepare a response for the client. 
+			response = "[server says]: That's correct!";				
+			} else {
+				response = "[server says]: That's incorrect!";
+				 }
+			client.playerAnswer[1] = "";
+			sendMessageToClient(response, client);
+			client.playerAnswer[1] = null;
+			response = null;
+			questionSent++;
+			} 
+			
+			
+			
+			
+		
+		
+		
+		
+		}	
 		
 		
 
@@ -139,9 +210,9 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			 String formattedMessage = String.format("[client %d] : %s", client.getClientID(), msg); 
 
 				if(msg.equals(new String("test"))) {
-					System.out.println("Your name is:" + client.playerName2 + " Your Answer is: " + client.playerAnswer + " You Have: " + client.playerPoints); //Tests user Name
+					System.out.println("Your name is:" + client.playerName2 + " Your Answer is: " + client.playerAnswer + " You Have: " + client.playerPoints + " Points" + "Client game is Started?: " + client.gameStarted); //Tests user Name
 				} else if (msg.equals(new String("ready"))) {
-					sendMessageToClient("Player " + client.playerName2 + " is Ready", client); 
+					sendMessageToClient("Player " + client.playerName2 + " is Ready", client); //TODO delete
 				} else
 				
 	        display(formattedMessage);
@@ -207,8 +278,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		
 		public synchronized void sendQuestionToClient(String gQuestion, ServerClientManager client) {
 			try {
-				gameQuestion = "SIema eniu";
-				gQuestion = gameQuestion;
+				
 				client.sendMessageToClient(gQuestion);
 			} catch (IOException e) {
 				System.err.println("[server: ] Server-to-client Question sending failed...");
@@ -286,8 +356,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			int clientCount = 0;
 
 			// loops until stopserver flag is set to true. 
-			while (!this.stopServer) {
-
+			while (!this.stopServer) {	
 				Socket clientSocket = null;
 				try {
 					clientSocket = serverSocket.accept();
