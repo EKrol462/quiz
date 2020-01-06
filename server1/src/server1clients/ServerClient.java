@@ -12,12 +12,11 @@ import java.net.SocketException;
 
 
 /**
- * Represents a client. 
- * Allows user inputs through keyboard and pass them to the server. 
- * Receives responses from the user. 
+ * Server Client Class
+ * Receives Input from user and sends various objects to the Server
  * 
- * @author thanuja
- * @version 20.11.2019
+ * @author Eryk Krol st20124378
+ * @version 06/01/2020
  */
 public class ServerClient implements Runnable {
 
@@ -37,33 +36,23 @@ public class ServerClient implements Runnable {
 	// variables to store Host IP and port number
 	private String 					host;
 	private static int 				port;
-	private static String           ip;
+    private static String           ip;
 	
-
-
-	//String pName = playerName;
-	
-	//Store Client Age
+	//Store Client Objects such as client details, player points, input etc
 	public static int 						playerAge;
-	
 	public String playerName2 = "Client";
-	
-	public String[] playerInput = new String[4];
-	
-	public String playerAnswer [] = new String[4]; // player answer to question
-	
+	public String playerInput;
+	public String playerAnswer;
 	public String playerPoints;
 	
-	String gameQuestion;
-
+	//object to determines if game is started
 	public String gameStarted = "false";
-	
+	//object to determine if player is ready
 	public boolean playerReady = false;
-	
-	
-	static boolean playerDetailsReceived = false;
-	
+	//object to determine if player has given server details	
 	static boolean serverDetailsReceived = false;
+	
+	
 	/**
 	 * Constructor, initiates a client, and calls for openConnection.
 	 * @param host
@@ -78,7 +67,7 @@ public class ServerClient implements Runnable {
 	
 	/**
 	 * opens a connection to the server
-	 * setup Object IO streams for the socket.
+	 * setup Object IO streams for the socket to send data across the connection.
 	 * 
 	 * @throws IOException
 	 */
@@ -101,7 +90,7 @@ public class ServerClient implements Runnable {
 			throw ex; // Rethrow the exception.
 		}
 		
-		// creates a Thread instance and starts the thread.
+		// creates a Thread for the user instance and starts the thread.
 		this.clientReader = new Thread(this);
 		this.stopClient = false;
 		this.clientReader.start();
@@ -123,24 +112,16 @@ public class ServerClient implements Runnable {
 	}
 
 	/**
-	 * Handle message from the server. In this case, simply display them. 
+	 * Handles Various messages such as questions, if the player has entered the correct answer etc.
 	 * @param msg
-	 */
-	
-
-	public void sendQuestionToServer(String gQuestion) {
-		//gameQuestion = gQuestion;
-		display(gQuestion);
-	} 
-	
-	
+	 */	
 	public void handleMessageFromServer(String msg) {
 		display(msg);
 
 	}
 	
 	/**
-	 * Simply display a String message in the terminal. 
+	 * Displays Server Message in the user terminal
 	 * @param message
 	 */
 	public void display(String message) {
@@ -176,14 +157,13 @@ public class ServerClient implements Runnable {
 	
 	/**
 	 * handles user inputs from the terminal. 
-	 * This should run as a separate thread. In this case, main thread. 
-	 * 
+	 *  
 	 */
 	public void runClient() {
 	
 		//Writes Player points as an object
 		try {
-			playerPoints = "60";
+			playerPoints = "0";
 			this.output.writeObject(playerPoints);
 		} catch (IOException e) {
 			System.out.println("Error sending player points");
@@ -201,8 +181,9 @@ public class ServerClient implements Runnable {
 			System.out.println("Error sending player name");
 			e.printStackTrace();
 		} System.out.println("Welcome to The Game! " + playerName2);
-		//System.out.println(gameQuestion);
+
 		
+		//A ready check for the player to start the game
 		String readycheck = "";
 		String ready = "ready";
 		if (!readycheck.equals(ready) ); {
@@ -220,56 +201,46 @@ public class ServerClient implements Runnable {
 				e1.printStackTrace();
 			}
 		
-		if(gameStarted.equals("true")) {
-	
-			for (int i = 0; i < 5; i++) {
+		/*while(gameStarted.equals("true")) { TODO Implement while check correctly so the input is only taken unitll the game is running
+		 *
+			for (int i = 0; i < 5; i++) { 
+		*/	
 		//Writes Player Answer as an object
+				
 		Scanner playerAns = new Scanner(System.in);
-		playerInput[i] = playerAns.nextLine();
+		playerInput = playerAns.nextLine();
 		
 		try {
-			playerAnswer[i] = playerInput[i];
-			this.output.writeObject(playerAnswer[i]);
+			playerAnswer = playerInput;
+			this.output.writeObject(playerAnswer);
+			System.out.println("Sending Answer");
 		} catch (IOException e) {
 			System.out.println("Error sending player answer");
 			e.printStackTrace();
-		} System.out.println("Your answer is: " + playerAnswer[i]);
-		//gameStarted = "false";
-		} 
-		}
+		} System.out.println("Your answer is: " + playerAnswer);
+			}
+	//	}
+		
+		
+		
 		//}
-		/*
-			//Answer 2
-			try {
-				Scanner playerAns = new Scanner(System.in);
-				playerAnswer = playerAns.nextLine();
-				this.output.writeObject(playerAnswer);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} System.out.println("Your answer is: " + playerAnswer);
-			//} 
-			//} */
-		
-		
+		// Buffer reader to Input and output information to the server
+		 
 			try {
 				BufferedReader fromConsole = new BufferedReader(new InputStreamReader(System.in));
 				String message = null;
 	
 			
 
-				
+			//Handles user input to send messges to the server, allows the user to finish the connection
 			while (true) {
 				message = fromConsole.readLine();
 				handleUserInput(message);
-			/*	if(message.equals("ready")) {
-					System.out.println("You are ready!");
-					playerReady = true;
-				} */
 				if(message.equals("over")) {
 						
-					break; }
+					break; } //breaks connection is user enters "over"
 				} 
+			
 			
 			System.out.println(playerName2 + ":" + "stopping client...");
 			this.stopClient = true;
@@ -278,11 +249,11 @@ public class ServerClient implements Runnable {
 		} catch (Exception ex) {
 			System.out.println(playerName2 + ":" + "unexpected error while reading from console!");
 		}
-	 }// end ready check
-	}
+	 }
+	
 
 	/**
-	 * Can perform any pre-processing or checking of the user input before sending it to server. 
+	 * Checks the user input for any errors before sending
 	 * 
 	 * @param userResponse
 	 */
@@ -303,25 +274,10 @@ public class ServerClient implements Runnable {
 		}
 	}
 	
-	/**
-	 * The thread that communicates with the server. 
-	 * receives a message from the server, passes it to handleMessageFromServer(). 
-	 * 
-	 */
-	/*
-	public static void playerDetails() {
-		Scanner playerInfo = new Scanner(System.in);
-		
-		System.out.println("Welcome! Please Enter Your Player Name:");
-		playerName = playerInfo.nextLine();
-		System.out.println("What is your age?");
-		playerAge = playerInfo.nextInt();
-		System.out.println("Welcome " + playerName + " " + playerAge);
-		playerDetailsReceived = true;
-		
-	}  */
 	
-	
+ /* Allows user to enter server connection details before connecting
+  * 
+  */
 	public static void serverConnectDetails () {
 		Scanner serverInfo = new Scanner(System.in);
 		
@@ -332,29 +288,29 @@ public class ServerClient implements Runnable {
 		serverDetailsReceived = true;
 		}
 	
+	/**
+	 * The thread that communicates with the server. 
+	 * receives a message from the server, passes it to handleMessageFromServer(). 
+	 */
 	@Override
 	public void run() {
 
 		String msg;
 		String pName;
-		String gQuestion;
 		
 		// Loop waiting for data
 
 		try {
 			while (!this.stopClient) {
-				// Get data from Server and send it to the handler
-				// The thread waits indefinitely at the following
-				// statement until something is received from the server
-				//gQuestion = (String) input.readObject();
+				// Reeives data from Server and send it to the handler
+				
 				msg = (String) input.readObject();
 
-				// Concrete subclasses do what they want with the
-				// msg by implementing the following method
-				//handleQuestionFromServer(gQuestion);
+				// Concrete subclasses implements the method
 				handleMessageFromServer(msg);
 			}
 			
+			//Closes the connecctions if an error occurs
 			System.out.println(playerName2 + ":" + "client stopped..");
 		} catch (Exception exception) {
 			if (!this.stopClient) {
@@ -377,7 +333,10 @@ public class ServerClient implements Runnable {
 	 */
 	public static void main(String[] args) {
 	
-			serverConnectDetails ();
+			serverConnectDetails (); //calls the method to gather connection details
+			/* establishes connection if the details are received
+			 * 
+			 */
 			if (serverDetailsReceived = true) {							
 	
 
@@ -390,10 +349,10 @@ public class ServerClient implements Runnable {
 			System.err.println(":" + "Error in openning the client connection to " + ip + " on port: " + port);
 		}
 		
-		System.out.println("Connected Succesfully, Welcome to The Game!");
+		System.out.println("Connected Succesfully, Welcome to The Game!"); //Message when the user connects to the server
 		
 
-		// Main thread continues and in this case used to handle user inputs from the terminal.
+		// Main thread continues sending messages to the server
 		chatclient.runClient();
 		}
 	}

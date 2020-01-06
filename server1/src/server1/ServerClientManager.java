@@ -8,9 +8,10 @@ import java.net.SocketException;
 
 
 //import server1clients.ServerClient;
-
-
-
+/**
+* @author Eryk Krol st20124378
+* @version 06/01/2020
+*/
 //import server1clients.ServerClient;
 
 public class ServerClientManager extends Thread {
@@ -35,8 +36,8 @@ public class ServerClientManager extends Thread {
 		//Store Declared Player Information from ServerClient Class
 		public String playerName;
 		public String playerName2;
-		public String playerAnswer [] = new String[4];
-		public String playerPoints;
+		public String playerAnswer;
+		public int playerPoints;
 		//public String pName = playerName;
 		public String gameQuestion;
 
@@ -157,20 +158,19 @@ public class ServerClientManager extends Thread {
 		@Override
 		public void run() {
 			
-			// The message from the client
-			String msg = "";
-			String gQuestion = "";
-			String pName2 = null;
-		    String ans [] = {"", "", "", "", ""};
-			String msg2 = "";
-			String pPoints = "0";
-			String gStarted = "false";
+			// Objects incoming from the user
+			
+			String msg = ""; //Message
+			String pName2 = null; //player name
+		    String ans = ""; //player answer 
+			String pPoints = "0"; //player points
+			String gStarted = "false"; //player started game true/false (string instead of boolean as the server does not currently support other object types.
 		
-			//Points
+			//Player points  object
 			try {
 			pPoints = (String)this.in.readObject();
 		} catch (ClassNotFoundException e2) {
-			// TODO Auto-generated catch block
+			System.out.println("Error, points class not found");
 			e2.printStackTrace();
 		} catch (IOException e2) {
 			System.out.println("Error sending player points to server");
@@ -179,11 +179,11 @@ public class ServerClientManager extends Thread {
 		this.server.sendPointsToServer(pPoints, this);
 			
 			
-			//Name
+			//Player Name
 			try {
 			pName2 = (String)this.in.readObject();
 		} catch (ClassNotFoundException e2) {
-			// TODO Auto-generated catch block
+			System.out.println("Error, Name class not found");
 			e2.printStackTrace();
 		} catch (IOException e2) {
 			System.out.println("Error sending player name to server");
@@ -196,7 +196,7 @@ public class ServerClientManager extends Thread {
 		try {
 			gStarted = (String)this.in.readObject();
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
+			System.out.println("Error, Game Started class not found");
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			System.out.println("Error sending player answer");
@@ -205,14 +205,15 @@ public class ServerClientManager extends Thread {
 		this.server.sendPlayerReady(gStarted,this);
 		
 		
-		if(gStarted.equals("true")) {
-		//Answer to question 
+		if(gStarted.equals("true")) { //TODO implement working "while gStarted
+		
+			//Player Answer to the class
 	
-			for (int i = 0; i < 5; i++) {
+			//for (int i = 0; i < 5; i++) {
 		try {
-			ans [i] = (String) this.in.readObject();
+			ans = (String) this.in.readObject();
 		} catch (ClassNotFoundException e2) {
-			// TODO Auto-generated catch block
+			System.out.println("Error, answer class not found");
 			e2.printStackTrace();
 		} catch (IOException e2) {
 			System.out.println("Error sending player answer to server");
@@ -220,31 +221,9 @@ public class ServerClientManager extends Thread {
 		}
 		this.server.sendAnswerToServer(ans, this);
 			}
-		/*
-		//Second Answer
-		try {
-			ans = (String)this.in.readObject();
-		} catch (ClassNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		this.server.sendAnswerToServer(ans, this); */
-		
-		
-		
-		
+	    //  }	
 		//}
 		
-			
-		
-		
-		
-		
-			
-			//String pName = "QQQ";
 			try {
 				while (!this.stopConnection) {
 					// This block waits until it reads a message from the client
@@ -288,11 +267,8 @@ public class ServerClientManager extends Thread {
 			}
 		}	
 
-						
-		}
-		
 		/**
-		 * @return a description of the client, including IP address and host Name
+		 * @return a description of the client, including IP address and host Name to the server
 		 */
 		public String toString() {
 			return this.clientSocket == null ? null : this.clientSocket.getInetAddress().getHostName() + " ("
@@ -300,18 +276,10 @@ public class ServerClientManager extends Thread {
 		}
 		
 		
-		//////// GETTERS AND SETTERS ////////////
+		//Getter for the client ID
 		public int getClientID() {
 			return this.clientID;
 		}	
-		
-	//public String getPlayerName() {
-		//	return this.pName;
-		//} 
-		
-		//public void setPlayerName(String newPlayerName) {
-			//this.playerName = newPlayerName;
-		//} 
 		
 
 	}

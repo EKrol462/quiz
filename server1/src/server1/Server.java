@@ -6,8 +6,12 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
-
+/**
+* @author Eryk Krol st20124378
+* @version 06/01/2020
+*/
 
 
 public class Server extends ServerAbstractComponents implements Runnable {
@@ -38,8 +42,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 			
 			
 			/**
-			 * Initializes the ThreadGroup. 
-			 * Use of a ThreadGroup is easier when handling multiple clients, although it is not a must. 
+			 * Initializes the ThreadGroup to allow more client connections and objects
 			 */
 			this.clientThreadGroup = new ThreadGroup("ClientManager threads");
 			
@@ -48,6 +51,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 		/**
 		 * Initializes the server. Takes port number, creates a new server socket instance. 
 		 * Starts the server's listening thread. 
+		 * Currently the server starts at local host (127.0.0.1) and port 7777
 		 * @param port
 		 * @throws IOException
 		 */
@@ -65,167 +69,200 @@ public class Server extends ServerAbstractComponents implements Runnable {
 
 		}
   
-		/**
-		 * handles messages from each client. In this case messages are simply displayed. 
-		 * Modified to prepare a response and send back to the same client. Simply changes the input text to upper case. 
-		 * This is a shared resource among all client threads, so it has to be synchronized.
+		/* All Objects coming from the output stream are below
 		 * 
-		 * 
-		 * @param msg
 		 * @param client
-		 */
-
+		 * */
 		
-
-			
-		
-		
-		
+		//Method for inputing player Name
 		public String playerName2;
 		public synchronized void sendNameToServer2(String pName2, ServerClientManager client) {
-			client.playerName2 = pName2;
+			client.playerName2 = pName2; //creates local variable of the output, assigned to the unique client
 		
 		  	}
-		
-		public String playerPoints;
+		//Method for inputing player points
+		public int playerPoints;
 		public synchronized void sendPointsToServer(String pPoints, ServerClientManager client) {
-			client.playerPoints = pPoints;
+			client.playerPoints = Integer.parseInt(pPoints); //creates local variable of the output, assigned to the unique client, converts from string to integer
+
+		}
+		
+		//Method for inputing game started state
+		public String gameStarted;
+		int questionSent = 0 ; //Count of questions the server has sent, allows for all users to answer questions at the same time
+		public synchronized void sendPlayerReady(String gStarted, ServerClientManager client) {
+			client.gameStarted = gStarted; //creates local variable of the output, assigned to the unique client
+			
+			ArrayList<String> gameQuestion = new ArrayList<String>(); //Array list for the game questions, more questions are stored in the method below
+			gameQuestion.add("What is The Planet Closest to The Sun? A.MERCURY  B. SATURN  C.VENUS");	
+			
+			//Displays the first Question when player enters the "ready state"
+			if (client.gameStarted.equals("true") )
+			{
+			if(questionSent == 0) { 
+			sendMessageToClient(gameQuestion.get(0), client); //sends the question to client			
+			}
+			}
+			
+		}
+			
+				
+		
+		public String playerAnswer;
+		public String [] gameAnswer = {"A", "B", "A", "C", "A",}; //Array for correct answers
+		public synchronized void sendAnswerToServer(String ans, ServerClientManager client) {
+			client.playerAnswer = ans; //Player answer, object from output stream, saved as a local variable
+
+			//Array list for user questions
+			
+			ArrayList<String> gameQuestion = new ArrayList<String>();
+			gameQuestion.add("When Microsoft Established?  A.1968  B.1975  C.1980");
+			gameQuestion.add("How Many NBA Championships did Michael Jordan Win With The Chicago Bulls? A. 6 B. 2 C. 8");	
+			gameQuestion.add("Who Holds The Current 100M Sprint World Record? A. Michael Phelps B.Wayne Gretzky C. Usain Bolt");
+			gameQuestion.add(" What temperature does water boil at? A. 100c B.80c C.120c");
+			
+			/**
+			 * TODO
+			 * This Method is work in progress, allows user to loop through all questions, the loop will be adjusted
+			 * depending how many questions the game has after XML script implementation
+			 * 
+			 	if (client.gameStarted.equals("true") )
+			{
+			for (int i = 0; i < 5; i++) {
+				 client.playerAnswer = ans;
+				 String response;
+				 sendMessageToClient(gameQuestion.get(i) client);
+				 System.out.println("Game Answer:"+ gameAnswer[i]);
+				 System.out.println("player Answer:" + client.playerAnswer);
+			     
+			 if(client.playerAnswer.equals(gameAnswer[i])) {
+		        //prepare a response for the client. 
+				response = "[Server:]: That's correct!";				
+				} else {
+					response = "[Server:]: That's incorrect!";
+					 }
+				sendMessageToClient(response, client);
+				
+				client.playerAnswer = "";
+		} 
+			}
+			client.gameStarted = "false"; */
+			
+			/**
+			 * Method to check the player question answer against the correct answer from the server 
+			 */
+			
+			if (client.gameStarted.equals("true") && questionSent == 0 ) //makes sure that the game state is on and that the correct question is being checked
+			{
+			String response; //Message which the server will send
+			//Outputs to the server what the user has entered and the correct answer, will allow for moderating the game
+			System.out.println("Game Answer:"+ gameAnswer[0]); 
+			System.out.println("player Answer:" + client.playerAnswer);
+
+			
+			if(client.playerAnswer.equals(gameAnswer[0])) //This will be called if the correct answer is entered
+			{
+	        //prepare a response for the client. 
+			response = "[Server:]: That's correct!";
+			client.playerPoints++; //adds player points
+			} else {
+				response = "[Server:]: That's incorrect!";  //This will be called if the incorrect answer is entered
+				 }
+			sendMessageToClient(response, client); //sends relevant response
+			client.playerAnswer = null; //resets player answer
+			response = null; //resets player response
+			questionSent++; //Adds 1 to question sent count (will allow next question to be sent
+		/**
+		 * TODO correct and implement other questions
+		 * Methods for all other questions to be sent, curently disabled due to bugs
+		 * 
+			client.playerAnswer = ans; 
+			
+			System.out.println("Game Answer:"+ gameAnswer);
+			System.out.println("player Answer:" + client.playerAnswer);
+			
+			if(questionSent == 1) {
+			if(client.playerAnswer.equals(gameAnswer[1])) {				
+	        //prepare a response for the client. 
+			response = "[Server:]: That's correct!";
+			client.playerPoints++;
+			} else {
+				response = "[Server:]: That's incorrect!";
+				 }
+			sendMessageToClient(response, client);
+			sendMessageToClient(gameQuestion.get(1), client);
+			client.playerAnswer = "";
+			client.playerAnswer = null;
+			response = null;
+			questionSent++;
+			//} 
+			
+			client.playerAnswer = ans; 
+			
+			System.out.println(questionSent);
+
+			if(questionSent == 2) {
+			System.out.println("Game Answer:"+ gameAnswer[2]);
+			System.out.println("player Answer:" + client.playerAnswer);
+			
+			if(client.playerAnswer.equals(gameAnswer[2])) {
+	        //prepare a response for the client. 
+			response = "[Server:]: That's correct!";
+			client.playerPoints++;
+			} else {
+				response = "[Server:]: That's incorrect!";
+				 }
+			sendMessageToClient(response, client);
+			sendMessageToClient(gameQuestion.get(2), client);
+			client.playerAnswer = null;
+			response = null;
+			questionSent++;
+		    }
+			}
+		
+
+			if(questionSent == 3) {
+			System.out.println("Game Answer:"+ gameAnswer[3]);
+			System.out.println("player Answer:" + client.playerAnswer);
+			
+			if(client.playerAnswer.equals(gameAnswer[3])) {
+	        //prepare a response for the client. 
+			response = "[Server:]: That's correct!";
+			client.playerPoints++;
+			} else {
+				response = "[Server:]: That's incorrect!";
+				 }
+			sendMessageToClient(response, client);
+			sendMessageToClient(gameQuestion.get(3), client);
+			client.playerAnswer = null;
+			response = null;
+			client.gameStarted = "false";
+		    }
+			*/
+			sendMessageToClient("You Finished With: " + client.playerPoints + " Points" ,  client); //Displays user points
+			
+			}
 		}
 		
 		
 		
-		
-	/*	public synchronized void sendQuestionToClient (String gQuestion, ServerClientManager client) {
-		gQuestion = gameQuestion;
-		try {
-			client.sendQuestionToClient(gQuestion);
-			this.output.writeObject(gQuestion);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		} */
-		
-		public String [] gameQuestion = {"A czy B?", "C czy D?"};
-		
-		public String gameStarted;
-		int questionSent = 0 ;
-		public synchronized void sendPlayerReady(String gStarted, ServerClientManager client) {
-			client.gameStarted = gStarted;
-
-
-			if (client.gameStarted.equals("true") )
-			{
-			if(questionSent == 0) {
-			sendMessageToClient(gameQuestion[0], client);
-			}
-			
-			if(questionSent == 1) {
-			sendMessageToClient(gameQuestion[1], client);
-			} 
-			} 
-				}
-		
-		public String playerAnswer[];
-		public String [] gameAnswer = {"A", "A"};
-		public synchronized void sendAnswerToServer(String ans[], ServerClientManager client) {
-		/*	if (client.gameStarted.equals("true") )
-			{
-			for (int i = 0; i < 5;) {
-				 client.playerAnswer[i] = ans[i];
-				 String response;
-				 sendMessageToClient(gameQuestion[0], client);
-				 System.out.println("Game Answer:"+ gameAnswer[i]);
-				 System.out.println("player Answer:" + client.playerAnswer[i]);
-			     
-			 if(client.playerAnswer[i].equals(gameAnswer[i])) {
-		        //prepare a response for the client. 
-				response = "[server says]: That's correct!";				
-				} else {
-					response = "[server says]: That's incorrect!";
-					 }
-				sendMessageToClient(response, client);
-				
-				client.playerAnswer[i] = "";
-		} 
-			}
-			client.gameStarted = "false"; */
-			//TODO Make a for loop
-			client.playerAnswer[0] = ans[0]; 
-			String response;
-			System.out.println("Game Answer:"+ gameAnswer[0]);
-			System.out.println("player Answer:" + client.playerAnswer[0]);
-			
-			if(client.playerAnswer[0].equals(gameAnswer[0]))
-			{
-	        //prepare a response for the client. 
-			response = "[server says]: That's correct!";				
-			} else {
-				response = "[server says]: That's incorrect!";
-				 }
-			sendMessageToClient(response, client);
-			client.playerAnswer[0] = null;
-			response = null;
-			questionSent++;
-			
-			
-			
-			client.playerAnswer[1] = ans[1]; 
-			
-			if(questionSent == 1) {
-			System.out.println("Game Answer:"+ gameAnswer[1]);
-			System.out.println("player Answer:" + client.playerAnswer[1]);
-			
-			if(client.playerAnswer[1].equals(gameAnswer[1])) {
-	        //prepare a response for the client. 
-			response = "[server says]: That's correct!";				
-			} else {
-				response = "[server says]: That's incorrect!";
-				 }
-			client.playerAnswer[1] = "";
-			sendMessageToClient(response, client);
-			client.playerAnswer[1] = null;
-			response = null;
-			questionSent++;
-			} 
-			
-			
-			
-			
-		
-		
-		
-		
-		}	
-		
-		
 
 		
 		
 		
-			
+	    //Displays message from client to server
 		
 		public synchronized void handleMessagesFromClient(String msg, ServerClientManager client) {
 			
 			// format the client message before displaying in server's terminal output. 
-			 String formattedMessage = String.format("[client %d] : %s", client.getClientID(), msg); 
+			 String formattedMessage = String.format("[Client %d] : %s", client.getClientID(), msg); 
 
-				if(msg.equals(new String("test"))) {
-					System.out.println("Your name is:" + client.playerName2 + " Your Answer is: " + client.playerAnswer + " You Have: " + client.playerPoints + " Points" + "Client game is Started?: " + client.gameStarted); //Tests user Name
-				} else if (msg.equals(new String("ready"))) {
-					sendMessageToClient("Player " + client.playerName2 + " is Ready", client); //TODO delete
+				if(msg.equals(new String("test"))) { //Tests all of user objects, can be used to display uniqueness of each clients attributes
+					System.out.println("Your name is:" + client.playerName2 + " Your Answer is: " + client.playerAnswer + " You Have: " + client.playerPoints + " Points" + "Client game is Started?: " + client.gameStarted); 
 				} else
-				
+				//Displays message from user to the server
 	        display(formattedMessage);
-	      
-		/*	if(client.playerAnswer == "A")
-			{
-	        //prepare a response for the client. 
-			String response = "[server says]: That's correct!";				
-			sendMessageToClient(response, client);
-			} else {
-				String response = "[server says]: That's incorrect!";
-			}  */
-			
+	     
 		}
 		
 		/**
@@ -361,20 +398,18 @@ public class Server extends ServerAbstractComponents implements Runnable {
 				try {
 					clientSocket = serverSocket.accept();
 				} catch (IOException e1) {
-					System.err.println("[server: ] Error when handling client connections on port " + port);
+					System.err.println("[Server:] Error when handling client connections on port " + port);
 				}
 
 				ServerClientManager cm = new ServerClientManager(this.clientThreadGroup, clientSocket, clientCount, this);
-				//	ClientManager cm = new ClientManager(this.clientThreadGroup, clientSocket, clientCount, this);
-
-				// new ClientManager(clientSocket, this);
+				
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					System.err.println("[server: ] server listner thread interruped..");
+					System.err.println("[Server:] server listner thread interruped..");
 				}
 
-				clientCount++;
+				clientCount++; //adds to client count when user is connected
 
 			}		
 		}
@@ -398,18 +433,17 @@ public class Server extends ServerAbstractComponents implements Runnable {
 
 			Server server = new Server();
 			// port number to listen
-			int port = 7777; //Integer.parseInt(args[0]); 
+			int port = 7777; //Set server port
 
 			try {
 				server.initializeServer(port);
 
 			} catch (IOException e) {
-				System.err.println("[server: ] Error in initializing the server on port " + port);
+				System.err.println("[Server: ] Error in initializing the server on port " + port);
 			}
 			// Main thread continues...
 
-			System.out.println("get user input...");
-			System.out.println("Hello World");
+			System.out.println("Server is online"); //Outputs when server is running
 			
 			new Thread(() -> {
 				String line = "";
@@ -425,13 +459,13 @@ public class Server extends ServerAbstractComponents implements Runnable {
 					}			
 				}
 				catch(IOException e) {
-					System.out.println("Error in System.in user input");
+					System.out.println("Error in System user input");
 				}
 				finally {
 					try {
 						consoleInput.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
+						System.out.println("Error in System user input");
 						e.printStackTrace();
 					}
 				}
