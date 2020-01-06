@@ -146,7 +146,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 				client.playerAnswer = "";
 		} 
 			}
-			client.gameStarted = "false"; */
+			client.gameStarted = "false"; //Shuts off the game after all questions */
 			
 			/**
 			 * Method to check the player question answer against the correct answer from the server 
@@ -190,7 +190,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 				response = "[Server:]: That's incorrect!";
 				 }
 			sendMessageToClient(response, client);
-			sendMessageToClient(gameQuestion.get(1), client);
+			sendMessageToClient(gameQuestion.get(1), client); //sends next question
 			client.playerAnswer = "";
 			client.playerAnswer = null;
 			response = null;
@@ -213,7 +213,7 @@ public class Server extends ServerAbstractComponents implements Runnable {
 				response = "[Server:]: That's incorrect!";
 				 }
 			sendMessageToClient(response, client);
-			sendMessageToClient(gameQuestion.get(2), client);
+			sendMessageToClient(gameQuestion.get(2), client); //sends next question
 			client.playerAnswer = null;
 			response = null;
 			questionSent++;
@@ -233,10 +233,10 @@ public class Server extends ServerAbstractComponents implements Runnable {
 				response = "[Server:]: That's incorrect!";
 				 }
 			sendMessageToClient(response, client);
-			sendMessageToClient(gameQuestion.get(3), client);
-			client.playerAnswer = null;
+			sendMessageToClient(gameQuestion.get(3), client); //sends next question
+			client.playerAnswer = null; 
 			response = null;
-			client.gameStarted = "false";
+			client.gameStarted = "false"; //Shuts off the game after all questions
 		    }
 			*/
 			sendMessageToClient("You Finished With: " + client.playerPoints + " Points" ,  client); //Displays user points
